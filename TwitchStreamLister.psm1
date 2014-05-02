@@ -7,7 +7,7 @@
     Copyright (c) 2014 Manuel "ElectronicWar" Kröber <manuel.kroeber@gmail.com>
 .NOTES
     Author:     Manuel "ElectronicWar" Kroeber <manuel.kroeber@gmail.com>
-    Version:    r2 (2014-05-02)
+    Version:    r3 (2014-05-02)
     License:    MIT
 .LINK
     https://github.com/ElectronicWar/twitchstreamlister
