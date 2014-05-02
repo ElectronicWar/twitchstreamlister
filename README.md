@@ -18,14 +18,7 @@ This will automatically download TwitchStreamLister as module into your profile 
 Clone this repository and copy `TwitchListStreams.psm1` somewhere in `%UserProfile%\Documents\WindowsPowerShell\Modules\`. Or directly clone it into your `Modules` folder.
 
 ## Usage
-Just type `Watch-TwitchStreams` and enjoy (be lazy and just type "Watch" and auto-complete with Tab).
-
-## How to change game and quality
-TwitchStreamLister is installed into `%UserProfile%\Documents\WindowsPowerShell\Modules\TwitchStreamLister\TwitchStreamLister.psm1`.
-
-To change the listed game, edit the `Invoke-TwitchGetStreams` call at the end or remove the paramter completely for interative input. The used stream quality can be changed there as well, default is "best".
-
-Make sure to restart your PowerShell after changes since modules are only loaded once on start.
+Just type `Watch-TwitchStreams` and enjoy (be lazy and just type "Watch" and auto-complete with Tab). Quality is hard-coded to "best" at the moment.
 
 ## Forks and modifications
 If you make substantial changes or want to fork and develop your own version, please register your program with Twitch.tv to retrieve your own Client ID for use with [Twitch.tv API](https://github.com/justintv/twitch-api). To do this, go to [http://www.twitch.tv/settings/connections](http://www.twitch.tv/settings/connections) and click on "Register your application" at the botton. It's fast and free :)
