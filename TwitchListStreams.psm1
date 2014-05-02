@@ -6,6 +6,13 @@
 # TwitchStreamLister is available under The MIT License (MIT). See included LICENSE.
 # Copyright (c) 2014 Manuel "ElectronicWar" Kröber <manuel.kroeber@gmail.com>
 
+Add-Type -AssemblyName System.Web
+
+if($PSVersionTable.PSVersion.Major -lt 4) {
+    Write-Warning "TwitchStreamLister requires PowerShell 4.0 or better; you have version $($Host.Version)."
+    return
+}
+
 function Invoke-TwitchGetStreams {
     Param (
         [Parameter(Mandatory=$True)]
@@ -41,15 +48,18 @@ function Invoke-TwitchListStreams {
 function Invoke-TwitchWatchStream {
     Param (
         [Parameter(Mandatory=$True, Position=0)]
+        [string]$quality,
+
+        [Parameter(Mandatory=$True, Position=1)]
         [PSObject]$streamList,
 
-        [Parameter(Mandatory=$True, Position=1, HelpMessage="Please enter the stream list number you want to watch.")]
-        [Int32]$streamNum
+        [Parameter(Mandatory=$True, Position=2)]
+        [Int32]$streamNumber
     )
 
-    if ($streamNum -gt 0) {
-        Write-Host ("Starting stream #" + $streamNum + " (" + $streamList[$streamNum-1].channel.display_name + ") with LiveStreamer using 'best' setting.")
-        livestreamer $streamList[$streamNum-1].channel.url best
+    if ($streamNumber -gt 0) {
+        Write-Host ("Starting stream #" + $streamNumber + " (" + $streamList[$streamNumber-1].channel.display_name + ") with LiveStreamer using 'best' setting.")
+        livestreamer $streamList[$streamNumber-1].channel.url $quality
     } else {
         Write-Host "Invalid stream number."
     }
@@ -58,4 +68,4 @@ function Invoke-TwitchWatchStream {
 $streams = Invoke-TwitchGetStreams("League of Legends")
 Write-Host "Top 25 Live Streams. Enter a number to watch it's associated stream."
 Invoke-TwitchListStreams($streams)
-Invoke-TwitchWatchStream($streams)
+Invoke-TwitchWatchStream("best", $streams)
