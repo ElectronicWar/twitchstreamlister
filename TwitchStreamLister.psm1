@@ -74,7 +74,7 @@ function Invoke-TwitchWatchStream {
 }
 
 function Watch-TwitchStreams {
-
+Write-Host "Fuck you"
     if($PSVersionTable.PSVersion.Major -lt 4) {
         Write-Error "TwitchStreamLister requires PowerShell 4.0 or better; you have version $($Host.Version)"
         return

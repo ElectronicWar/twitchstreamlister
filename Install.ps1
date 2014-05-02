@@ -22,13 +22,13 @@ function Install-TwitchStreamLister {
         }
     }
 
-    $scriptUrl = "https://raw.githubusercontent.com/ElectronicWar/twitchstreamlister/master/TwitchListStreams.psm1"
+    $scriptUrl = "https://raw.githubusercontent.com/ElectronicWar/twitchstreamlister/master/TwitchStreamLister.psm1"
     
-    New-Item ($Destination + "\TwitchListStreams\") -ItemType Directory -Force | out-null
+    New-Item ($Destination + "\TwitchStreamLister\") -ItemType Directory -Force | out-null
     Write-Host Downloading TwitchStreamLister from $scriptUrl
     $client = (New-Object Net.WebClient)
     $client.Proxy.Credentials = [System.Net.CredentialCache]::DefaultNetworkCredentials
-    $client.DownloadFile($scriptUrl, $Destination + "\TwitchListStreams\TwitchListStreams.psm1")
+    $client.DownloadFile($scriptUrl, $Destination + "\TwitchStreamLister\TwitchStreamLister.psm1")
 
     $executionPolicy  = (Get-ExecutionPolicy)
     $executionRestricted = ($executionPolicy -eq "Restricted")
