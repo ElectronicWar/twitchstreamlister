@@ -16,21 +16,59 @@
 
 Add-Type -AssemblyName System.Web
 
-function Invoke-TwitchGetStreams {
+function Invoke-TwitchApi {
     Param (
         [Parameter(Mandatory=$True)]
-        [string]$gameName
+        [String]$commandUrl
     )
 
     $clientID = "sw19g2vrz9nkugaviab9xbk6w7ehxxh"
     $userAgent = "PowerShell StreamLister"
     $game = [System.Web.HttpUtility]::UrlEncode($gameName);
-    $url = "https://api.twitch.tv/kraken/streams?game=" + $game
+    $apiUrl = "https://api.twitch.tv/kraken"
     $headers = @{"Client-ID" = $ClientID}
     
+    $requestUrl = $apiUrl + $commandUrl
+
+    $apiResult = Invoke-RestMethod -Uri $requestUrl -Method Get -UserAgent $userAgent -Headers $headers
+    if ($apiResult) {
+        return $apiResult
+    } else {
+        Write-Warning "Sorry, but there was a problem with the last twitch.tv API call."
+        return
+    }
+}
+
+function Invoke-TwitchGetStreams {
+    Param (
+        [Parameter(Mandatory=$True)]
+        [String]$gameName
+    )
+
+    $game = [System.Web.HttpUtility]::UrlEncode($gameName);
+    $command = "/streams?game=" + $game
+    
     Write-Host ("Retrieving '" + $gameName + "' stream list from Twitch.tv API...")
-    $apiResult = Invoke-RestMethod -Uri $url -Method Get -UserAgent $userAgent -Headers $headers
-    return $apiResult.streams
+    $gameStreams =  Invoke-TwitchApi -commandUrl $command
+    if ($gameStreams) {
+        return $gameStreams.streams
+    } else {
+        return
+    }
+}
+
+function Invoke-TwitchGetTopGames {
+    $game = [System.Web.HttpUtility]::UrlEncode($gameName);
+    $command = "/games/top?limit=10"
+    
+    Write-Host ("Retrieving top games list from Twitch.tv API...")
+    $topGames =  Invoke-TwitchApi -commandUrl $command
+    if ($topGames) {
+        return $topGames.top
+        $topGames.top
+    } else {
+        return
+    }
 }
 
 function Invoke-TwitchListStreams {
@@ -39,12 +77,41 @@ function Invoke-TwitchListStreams {
         [PSObject]$streamList
     )
 
+    $nameLen = 0
+    foreach ($stream in $streamList) {
+        $len = $stream.channel.display_name.Length
+        if ($len -gt $nameLen) { $nameLen = $len }
+    }
+    $nameLen++
+
     $streamNum = 0
     foreach ($stream in $streamList) {
         $streamNum++
         Write-Host -NoNewLine ($streamNum.ToString().PadLeft(2, "0") + ": ")
-        Write-Host -NoNewLine -ForegroundColor "Green" ($stream.channel.display_name.PadRight(25, " "))
+        Write-Host -NoNewLine -ForegroundColor "Green" ($stream.channel.display_name.PadRight($nameLen, " "))
         Write-Host $stream.viewers "Viewers"
+    }
+}
+
+function Invoke-TwitchListGames {
+    Param (
+        [Parameter(Mandatory=$True)]
+        [PSObject]$gameList
+    )
+
+    $gameLen = 0
+    foreach ($game in $gameList) {
+        $len = $game.game.name.Length
+        if ($len -gt $gameLen) { $gameLen = $len }
+    }
+    $gameLen++
+
+    $gameNum = 0
+    foreach ($game in $gameList) {
+        $gameNum++
+        Write-Host -NoNewLine ($gameNum.ToString().PadLeft(2, "0") + ": ")
+        Write-Host -NoNewLine -ForegroundColor "Green" ($game.game.name.PadRight($gameLen, " "))
+        Write-Host $game.viewers "Viewers in" $game.channels "Channels"
     }
 }
 
@@ -79,8 +146,22 @@ function Watch-TwitchStreams {
         return
     }
 
-    $streams = Invoke-TwitchGetStreams -game "League of Legends"
+    $games = Invoke-TwitchGetTopGames
+    if (!$games) {
+        Write-Warning "Something went wrong, please try again."
+        return
+    }
     
+    Invoke-TwitchListGames($games)
+    [Int32]$gameNumber = Read-Host "Enter game number to list it's top channels"
+    $gameNumber--
+
+    if ($gameNumber -lt 0) {
+        Write-Host "Invalid number. Aborted."
+        return
+    }
+
+    $streams = Invoke-TwitchGetStreams -game ($games[$gameNumber].game.name)
     if ($streams) {
         Write-Host "Top 25 Live Streams. Enter a number to watch it's associated stream."
 
@@ -89,7 +170,7 @@ function Watch-TwitchStreams {
         $streamNumber = Read-Host "Enter stream number to watch"
         Invoke-TwitchWatchStream -streamList $streams -streamNumber $streamNumber -quality "best"
     } else {
-        Write-Warning "Unable to retrieve live stream list :("
+        Write-Warning "Unable to retrieve live stream list, please try again."
         return
     }
 }
