@@ -1,17 +1,20 @@
-# TwitchStreamLister
-# Helping hand for LiveStreamer users
-#
-# Version r1 (2014-05-02)
-#
-# TwitchStreamLister is available under The MIT License (MIT). See included LICENSE.
-# Copyright (c) 2014 Manuel "ElectronicWar" Kröber <manuel.kroeber@gmail.com>
+<#
+.SYNOPSIS
+    TwitchStreamLister, a helping hand for LiveStreamer users.
+.DESCRIPTION
+    Help can be found in README.md
+    TwitchStreamLister is available under The MIT License (MIT). See included LICENSE.
+    Copyright (c) 2014 Manuel "ElectronicWar" Kröber <manuel.kroeber@gmail.com>
+.NOTES
+    Author:     Manuel "ElectronicWar" Kroeber <manuel.kroeber@gmail.com>
+    Version:    r2 (2014-05-02)
+    License:    MIT
+.LINK
+    https://github.com/ElectronicWar/twitchstreamlister
+#>
+#requires -Version 4.0
 
 Add-Type -AssemblyName System.Web
-
-if($PSVersionTable.PSVersion.Major -lt 4) {
-    Write-Warning "TwitchStreamLister requires PowerShell 4.0 or better; you have version $($Host.Version)."
-    return
-}
 
 function Invoke-TwitchGetStreams {
     Param (
@@ -47,25 +50,47 @@ function Invoke-TwitchListStreams {
 
 function Invoke-TwitchWatchStream {
     Param (
-        [Parameter(Mandatory=$True, Position=0)]
-        [string]$quality,
-
-        [Parameter(Mandatory=$True, Position=1)]
+        [Parameter(Mandatory=$True)]
         [PSObject]$streamList,
 
-        [Parameter(Mandatory=$True, Position=2)]
-        [Int32]$streamNumber
+        [Parameter(Mandatory=$True)]
+        [Int32]$streamNumber,
+
+        [Parameter(Mandatory=$False)]
+        [String]$quality = "best"
     )
 
     if ($streamNumber -gt 0) {
-        Write-Host ("Starting stream #" + $streamNumber + " (" + $streamList[$streamNumber-1].channel.display_name + ") with LiveStreamer using 'best' setting.")
+        Write-Host (
+            "Starting stream #" + $streamNumber +
+            " (" + $streamList[$streamNumber-1].channel.display_name +
+            ") with LiveStreamer using " +
+            $quality + " setting."
+        )
         livestreamer $streamList[$streamNumber-1].channel.url $quality
     } else {
         Write-Host "Invalid stream number."
     }
 }
 
-$streams = Invoke-TwitchGetStreams("League of Legends")
-Write-Host "Top 25 Live Streams. Enter a number to watch it's associated stream."
-Invoke-TwitchListStreams($streams)
-Invoke-TwitchWatchStream("best", $streams)
+function Watch-TwitchStreams {
+
+    if($PSVersionTable.PSVersion.Major -lt 4) {
+        Write-Error "TwitchStreamLister requires PowerShell 4.0 or better; you have version $($Host.Version)"
+        return
+    }
+
+    $streams = Invoke-TwitchGetStreams -game "League of Legends"
+    
+    if ($streams) {
+        Write-Host "Top 25 Live Streams. Enter a number to watch it's associated stream."
+
+        Invoke-TwitchListStreams -streamList $streams
+        
+        $streamNumber = Read-Host "Enter stream number to watch"
+        Invoke-TwitchWatchStream -streamList $streams -streamNumber $streamNumber -quality "best"
+    } else {
+        Write-Warning "Unable to retrieve live stream list :("
+        return
+    }
+}
