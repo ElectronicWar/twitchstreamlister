@@ -48,7 +48,7 @@ function Invoke-TwitchGetStreams {
     $game = [System.Web.HttpUtility]::UrlEncode($gameName);
     $command = "/streams?game=" + $game
     
-    Write-Host ("Retrieving '" + $gameName + "' stream list from Twitch.tv API...")
+    Write-Host ("Retrieving top 25 '" + $gameName + "' streams...")
     $gameStreams =  Invoke-TwitchApi -commandUrl $command
     if ($gameStreams) {
         return $gameStreams.streams
@@ -61,7 +61,7 @@ function Invoke-TwitchGetTopGames {
     $game = [System.Web.HttpUtility]::UrlEncode($gameName);
     $command = "/games/top?limit=10"
     
-    Write-Host ("Retrieving top games list from Twitch.tv API...")
+    Write-Host ("Retrieving top live games...")
     $topGames =  Invoke-TwitchApi -commandUrl $command
     if ($topGames) {
         return $topGames.top
@@ -89,7 +89,7 @@ function Invoke-TwitchListStreams {
         $streamNum++
         Write-Host -NoNewLine ($streamNum.ToString().PadLeft(2, "0") + ": ")
         Write-Host -NoNewLine -ForegroundColor "Green" ($stream.channel.display_name.PadRight($nameLen, " "))
-        Write-Host $stream.viewers "Viewers"
+        Write-Host $stream.viewers.ToString().PadLeft(6, " ") "Viewers"
     }
 }
 
@@ -111,7 +111,7 @@ function Invoke-TwitchListGames {
         $gameNum++
         Write-Host -NoNewLine ($gameNum.ToString().PadLeft(2, "0") + ": ")
         Write-Host -NoNewLine -ForegroundColor "Green" ($game.game.name.PadRight($gameLen, " "))
-        Write-Host $game.viewers "Viewers in" $game.channels "Channels"
+        Write-Host $game.viewers.ToString().PadLeft(6, " ") "Viewers in" $game.channels "Channels"
     }
 }
 
@@ -132,7 +132,7 @@ function Invoke-TwitchWatchStream {
             "Starting stream #" + $streamNumber +
             " (" + $streamList[$streamNumber-1].channel.display_name +
             ") with LiveStreamer using " +
-            $quality + " setting."
+            $quality + " quality setting."
         )
         livestreamer $streamList[$streamNumber-1].channel.url $quality
     } else {
@@ -163,10 +163,8 @@ function Watch-TwitchStreams {
 
     $streams = Invoke-TwitchGetStreams -game ($games[$gameNumber].game.name)
     if ($streams) {
-        Write-Host "Top 25 Live Streams. Enter a number to watch it's associated stream."
-
         Invoke-TwitchListStreams -streamList $streams
-        
+
         $streamNumber = Read-Host "Enter stream number to watch"
         Invoke-TwitchWatchStream -streamList $streams -streamNumber $streamNumber -quality "best"
     } else {
