@@ -4,10 +4,10 @@
 .DESCRIPTION
     Help can be found in README.md
     TwitchStreamLister is available under The MIT License (MIT). See included LICENSE.
-    Copyright (c) 2014 Manuel "ElectronicWar" Kröber <manuel.kroeber@gmail.com>
+    Copyright (c) 2014 Manuel "ElectronicWar" Kroeber <manuel.kroeber@gmail.com>
 .NOTES
     Author:     Manuel "ElectronicWar" Kroeber <manuel.kroeber@gmail.com>
-    Version:    r3 (2014-05-02)
+    Version:    r4 (2014-05-08)
     License:    MIT
 .LINK
     https://github.com/ElectronicWar/twitchstreamlister
@@ -153,11 +153,11 @@ function Watch-TwitchStreams {
     }
     
     Invoke-TwitchListGames($games)
-    [Int32]$gameNumber = Read-Host "Enter game number to list it's top channels"
+    [Int32]$gameNumber = Read-Host "Enter game number to list it's top channels. 0 to exit"
     $gameNumber--
 
     if ($gameNumber -lt 0) {
-        Write-Host "Invalid number. Aborted."
+        Write-Host "Exiting. Thanks for using!"
         return
     }
 
@@ -165,8 +165,14 @@ function Watch-TwitchStreams {
     if ($streams) {
         Invoke-TwitchListStreams -streamList $streams
 
-        $streamNumber = Read-Host "Enter stream number to watch"
+        [Int32]$streamNumber = Read-Host "Enter stream number to watch. 0 to exit"
+        if ($streamNumber -lt 0) {
+            Write-Host "Exiting. Thanks for using!"
+            return
+        }
+
         Invoke-TwitchWatchStream -streamList $streams -streamNumber $streamNumber -quality "best"
+        Watch-TwitchStreams
     } else {
         Write-Warning "Unable to retrieve live stream list, please try again."
         return
