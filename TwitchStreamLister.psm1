@@ -7,7 +7,7 @@
     Copyright (c) 2014 Manuel "ElectronicWar" Kroeber <manuel.kroeber@gmail.com>
 .NOTES
     Author:     Manuel "ElectronicWar" Kroeber <manuel.kroeber@gmail.com>
-    Version:    r4 (2014-05-08)
+    Version:    r5 (2016-11-16)
     License:    MIT
 .LINK
     https://github.com/ElectronicWar/twitchstreamlister
@@ -26,7 +26,10 @@ function Invoke-TwitchApi {
     $userAgent = "PowerShell StreamLister"
     $game = [System.Web.HttpUtility]::UrlEncode($gameName);
     $apiUrl = "https://api.twitch.tv/kraken"
-    $headers = @{"Client-ID" = $ClientID}
+    $headers = @{
+        "Client-ID" = $ClientID;
+        "Accept" = "application/vnd.twitchtv.v5+json"
+    }
     
     $requestUrl = $apiUrl + $commandUrl
 
