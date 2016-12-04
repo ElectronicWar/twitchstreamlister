@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    TwitchStreamLister, a helping hand for LiveStreamer users.
+    TwitchStreamLister, a helping hand for StreamLink users.
 .DESCRIPTION
     Help can be found in README.md
     TwitchStreamLister is available under The MIT License (MIT). See included LICENSE.
@@ -134,10 +134,10 @@ function Invoke-TwitchWatchStream {
         Write-Host (
             "Starting stream #" + $streamNumber +
             " (" + $streamList[$streamNumber-1].channel.display_name +
-            ") with LiveStreamer using " +
+            ") with StreamLink using " +
             $quality + " quality setting."
         )
-        livestreamer $streamList[$streamNumber-1].channel.url $quality
+        streamlink $streamList[$streamNumber-1].channel.url $quality
     } else {
         Write-Host "Invalid stream number."
     }
