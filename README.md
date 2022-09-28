@@ -1,4 +1,4 @@
-**⚠️ This repo is now archived as it stopped working with the shutdown of the Twitch v5/Kraken API in February 2022. ⚠️**
+**⚠️ This tool stopped working with the shutdown of the Twitch v5/Kraken API in February 2022. ⚠️**
 
 There are no plans to migrate to the Twitch Helix API, sorry.
 
